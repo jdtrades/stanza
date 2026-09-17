@@ -4,6 +4,8 @@ A private songwriter’s desk. Write verses and choruses on lined paper, keep no
 
 No cloud APIs. No hosted models. Lyrics never leave the device.
 
+![Stanza lyric desk](docs/desk.png)
+
 ## QVAC SDK
 
 This app is built for Tether’s QVAC bounty: a local AI app using the JS SDK.
