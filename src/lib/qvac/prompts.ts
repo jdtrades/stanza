@@ -101,7 +101,7 @@ export function stripModelChrome(text: string) {
     .replace(/<think>[\s\S]*?<\/think>/gi, "")
     .replace(/^```(?:\w+)?\s*/i, "")
     .replace(/\s*```$/i, "")
-    .replace(/^["\u201c]|["\u201d]$/g, "")
+    .replace(/^["“]|["”]$/g, "")
     .trim();
 }
 

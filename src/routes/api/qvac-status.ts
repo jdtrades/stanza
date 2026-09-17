@@ -12,11 +12,11 @@ export const Route = createFileRoute("/api/qvac-status")({
         } catch (error) {
           return Response.json(
             {
-              available: Boolean(process.env.XAI_API_KEY),
-              backend: process.env.XAI_API_KEY ? "xai" : "none",
+              available: false,
+              backend: "none",
               sdk: "@qvac/sdk",
               sdkVersion: "0.19.1",
-              model: process.env.XAI_API_KEY ? "Grok" : "Qwen3 0.6B Instruct Q4",
+              model: "Qwen3 0.6B Instruct Q4",
               state: {
                 status: "error",
                 message:
@@ -24,7 +24,6 @@ export const Route = createFileRoute("/api/qvac-status")({
                     ? error.message
                     : "QVAC could not start in this environment.",
               },
-              xaiAvailable: Boolean(process.env.XAI_API_KEY),
               functions: ["loadModel", "completion"],
             },
             { status: 200 },

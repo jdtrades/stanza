@@ -5,10 +5,6 @@ dist
 .nitro
 .tanstack
 .qvac
-.grok
-screenshots
-attachments
-artifacts
 *.log
 .DS_Store
 .env

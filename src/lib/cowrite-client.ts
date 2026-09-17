@@ -44,7 +44,7 @@ export async function cowriteStream(
 
 export interface QvacStatus {
   available: boolean;
-  backend: "qvac" | "xai" | "none";
+  backend: "qvac" | "none";
   sdk: string;
   sdkVersion: string;
   model: string;
@@ -53,9 +53,7 @@ export interface QvacStatus {
     | { status: "loading"; percentage: number; downloaded: number; total: number }
     | { status: "ready"; modelId: string }
     | { status: "error"; message: string };
-  xaiAvailable: boolean;
   functions: string[];
-  error?: string;
 }
 
 export async function fetchQvacStatus(): Promise<QvacStatus> {
@@ -68,7 +66,6 @@ export async function fetchQvacStatus(): Promise<QvacStatus> {
       sdkVersion: "0.19.1",
       model: "Qwen3 0.6B Instruct Q4",
       state: { status: "error", message: "Status endpoint unavailable." },
-      xaiAvailable: false,
       functions: ["loadModel", "completion"],
     };
   }

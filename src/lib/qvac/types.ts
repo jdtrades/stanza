@@ -26,7 +26,7 @@ export interface CowriteRequest {
 
 export type CowriteEvent =
   | { type: "status"; message: string }
-  | { type: "backend"; name: "qvac" | "xai" }
+  | { type: "backend"; name: "qvac" }
   | { type: "progress"; percentage: number; downloaded: number; total: number }
   | { type: "token"; text: string }
   | { type: "done"; text: string }

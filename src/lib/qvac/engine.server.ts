@@ -6,7 +6,6 @@ import {
   type CompletionEvent,
   type ModelProgressUpdate,
 } from "@qvac/sdk";
-import { hasXai, runXaiCowrite } from "./xai.server";
 import { buildHistory, stripModelChrome } from "./prompts";
 import type { CowriteEvent, CowriteRequest } from "./types";
 
@@ -16,6 +15,7 @@ if (!process.env.QVAC_CONFIG_PATH) {
 
 const MODEL_SRC = QWEN3_600M_INST_Q4;
 const MODEL_NAME = "Qwen3 0.6B Instruct Q4";
+const SDK_VERSION = "0.19.1";
 
 type EngineState =
   | { status: "idle" }
@@ -26,22 +26,17 @@ type EngineState =
 let state: EngineState = { status: "idle" };
 let loadPromise: Promise<string> | null = null;
 
-function isWorkerFailure(message: string) {
-  return /rpc|worker|bare runtime|initialization/i.test(message);
-}
-
 export function getEngineSnapshot() {
-  const xai = hasXai();
-  const qvacReady = state.status === "ready";
-  const backend = qvacReady ? "qvac" : xai ? "xai" : state.status === "error" ? "none" : "qvac";
   return {
-    available: qvacReady || xai,
-    backend,
+    available:
+      state.status === "ready" ||
+      state.status === "idle" ||
+      state.status === "loading",
+    backend: "qvac" as const,
     sdk: "@qvac/sdk",
-    sdkVersion: "0.19.1",
-    model: qvacReady ? MODEL_NAME : xai ? "Grok" : MODEL_NAME,
+    sdkVersion: SDK_VERSION,
+    model: MODEL_NAME,
     state,
-    xaiAvailable: xai,
     functions: ["loadModel", "completion"] as const,
   };
 }
@@ -82,11 +77,12 @@ async function ensureModel(
   }
 }
 
-async function* runQvacCowrite(
+export async function* runCowrite(
   request: CowriteRequest,
 ): AsyncGenerator<CowriteEvent> {
   yield { type: "backend", name: "qvac" };
   yield { type: "status", message: "Loading local model" };
+
   const modelId = await ensureModel((progress) => {
     state = {
       status: "loading",
@@ -95,6 +91,7 @@ async function* runQvacCowrite(
       total: progress.total,
     };
   });
+
   if (state.status === "loading") {
     yield {
       type: "progress",
@@ -125,37 +122,4 @@ async function* runQvacCowrite(
   const final = await run.final;
   const text = stripModelChrome(final.contentText || assembled);
   yield { type: "done", text };
-}
-
-export async function* runCowrite(
-  request: CowriteRequest,
-): AsyncGenerator<CowriteEvent> {
-  const preferXai = hasXai() && state.status !== "ready";
-
-  if (!preferXai && state.status !== "error") {
-    try {
-      for await (const event of runQvacCowrite(request)) {
-        yield event;
-      }
-      return;
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "On-device generation failed.";
-      if (!hasXai() || !isWorkerFailure(message)) {
-        yield { type: "error", message };
-        return;
-      }
-    }
-  }
-
-  if (hasXai()) {
-    yield* runXaiCowrite(request);
-    return;
-  }
-
-  const message =
-    state.status === "error"
-      ? state.message
-      : "Local model could not start. Run Stanza on your computer to use on-device QVAC.";
-  yield { type: "error", message };
 }
