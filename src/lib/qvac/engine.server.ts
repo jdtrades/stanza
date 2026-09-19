@@ -1,4 +1,4 @@
-import { join } from "node:path";
+import "./qvac-env.server.ts";
 import {
   completion,
   loadModel,
@@ -8,10 +8,6 @@ import {
 } from "@qvac/sdk";
 import { buildHistory, stripModelChrome } from "./prompts";
 import type { CowriteEvent, CowriteRequest } from "./types";
-
-if (!process.env.QVAC_CONFIG_PATH) {
-  process.env.QVAC_CONFIG_PATH = join(process.cwd(), "qvac.config.json");
-}
 
 const MODEL_SRC = QWEN3_600M_INST_Q4;
 const MODEL_NAME = "Qwen3 0.6B Instruct Q4";

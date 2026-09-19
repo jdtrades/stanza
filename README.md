@@ -25,7 +25,7 @@ The web app loads the model and streams tokens in [`src/lib/qvac/engine.server.t
 - npm `>= 10.9`
 - A few hundred MB of disk for the first local model download (~382 MB). Later runs reuse the cache.
 
-On **Linux**, the QVAC worker needs Vulkan:
+On **Linux**, the QVAC worker needs Vulkan. Stanza ships `vendor/linux-x64/libvulkan.so.1` for that. If the worker still cannot start:
 
 ```bash
 sudo apt install libvulkan1
